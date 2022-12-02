@@ -1,29 +1,18 @@
-﻿// See https://aka.ms/new-console-template for more information
-if (args.Length == 0)
-{
-    WriteLine("Please specify the input file path as an argument!");
-    return;
-}
+﻿var input = File.ReadAllLines("../puzzle-input.txt");
 
-var input = File.ReadAllLines(args[0]);
-
-var caloriesByElf = ParseCaloriesByElf(input).ToList();
+var caloriesByElf = CalculateCalories(input).ToList();
 
 WriteLine(caloriesByElf.Max(e => e));
-
 WriteLine(caloriesByElf.OrderByDescending(e => e).Take(3).Sum());
 
-IEnumerable<int> ParseCaloriesByElf(string[] input)
+IEnumerable<int> CalculateCalories(string[] input)
 {
     var caloriesCarriedByElf = 0;
 
     foreach (var line in input)
     {
-        if (int.TryParse(line, out var calories))
-        {
-            caloriesCarriedByElf += calories;
-        }
-        
+        if (int.TryParse(line, out var calories)) caloriesCarriedByElf += calories;
+
         if (string.IsNullOrEmpty(line))
         {
             yield return caloriesCarriedByElf;
