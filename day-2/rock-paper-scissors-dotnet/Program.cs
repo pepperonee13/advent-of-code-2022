@@ -2,32 +2,36 @@
 using static Result;
 
 var input = File.ReadAllLines("../puzzle-input.txt");
-var lines = input.Select(ParseGuideline).ToList();
-var scores = lines.Select(PlayGame).ToList();
-
-var totalScore = scores.Select(x => x.P2).Sum();
+var totalScore = input.Select(ParseGuideline).Select(PlayGame).Select(scores => scores.P2).Sum();
 WriteLine(totalScore);
 
 Guideline ParseGuideline(string line)
 {
-    var splitResult = line.Split(" ");
-    Choice opponent;
-    switch (splitResult[0])
+    Choice ParseChoice(string input)
     {
-        case "A": opponent = Rock; break;
-        case "B": opponent = Paper; break;
-        case "C": opponent = Scissors; break;
-        default: throw new ArgumentException($"Could not parse {splitResult[0]}");
+        return input switch
+        {
+            "A" => Rock,
+            "B" => Paper,
+            "C" => Scissors,
+            _ => throw new Exception("Unknown choice")
+        };
     }
 
-    Result desiredResult;
-    switch (splitResult[1])
+    Result ParseResult(string input)
     {
-        case "X": desiredResult = Lose; break;
-        case "Y": desiredResult = Draw; break;
-        case "Z": desiredResult = Win; break;
-        default: throw new ArgumentException($"Could not parse {splitResult[1]}");
+        return input switch
+        {
+            "X" => Lose,
+            "Y" => Draw,
+            "Z" => Win,
+            _ => throw new Exception("Unknown result")
+        };
     }
+
+    var splitResult = line.Split(" ");
+    Choice opponent = ParseChoice(splitResult[0]);
+    Result desiredResult = ParseResult(splitResult[1]);
 
     return new Guideline(opponent, desiredResult);
 }
@@ -42,10 +46,11 @@ Score PlayGame(Guideline guideline)
         _ => throw new Exception("unexpected choice")
     };
 
-    var opponentScore = GetPointsForChoice(guideline.Opponent);
     var yourChoice = GetChoiceBasedOnGuideline(guideline);
-    var yourScore = GetPointsForChoice(yourChoice);
     var result = GetResult(guideline.Opponent, yourChoice);
+
+    var opponentScore = GetPointsForChoice(guideline.Opponent);
+    var yourScore = GetPointsForChoice(yourChoice);
     var (p1Score, p2Score) = GetScores(result);
 
     return new Score(opponentScore + p1Score, yourScore + p2Score);
