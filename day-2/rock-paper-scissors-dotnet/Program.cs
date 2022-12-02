@@ -39,61 +39,59 @@ Score PlayGame(Guideline guideline)
         Rock => 1,
         Paper => 2,
         Scissors => 3,
-        _ => 0
+        _ => throw new Exception("unexpected choice")
     };
 
     var opponentScore = GetPointsForChoice(guideline.Opponent);
     var yourChoice = GetChoiceBasedOnGuideline(guideline);
     var yourScore = GetPointsForChoice(yourChoice);
+    var result = GetResult(guideline.Opponent, yourChoice);
+    var (p1Score, p2Score) = GetScores(result);
 
-    var game = new Game(guideline.Opponent, yourChoice);
+    return new Score(opponentScore + p1Score, yourScore + p2Score);
+}
 
-    var result = game switch
+static Choice GetChoiceBasedOnGuideline(Guideline guideline)
+{
+    if (guideline.DesiredResult == Draw) return guideline.Opponent;
+
+    return (guideline.Opponent, guideline.DesiredResult) switch
     {
-        { P1: Rock, P2: Rock } => Draw,
-        { P1: Paper, P2: Paper } => Draw,
-        { P1: Scissors, P2: Scissors } => Draw,
+        (Rock, Lose) => Scissors,
+        (Rock, Win) => Paper,
+        (Paper, Lose) => Rock,
+        (Paper, Win) => Scissors,
+        (Scissors, Lose) => Paper,
+        (Scissors, Win) => Rock,
+        _ => throw new Exception("unhandled case")
+    };
+}
 
-        { P1: Scissors, P2: Paper } => Lose,
-        { P1: Paper, P2: Rock } => Lose,
-        { P1: Rock, P2: Scissors } => Lose,
+static Result GetResult(Choice P1, Choice P2)
+{
+    if (P1 == P2) return Draw;
 
-        { P1: Scissors, P2: Rock } => Win,
-        { P1: Paper, P2: Scissors } => Win,
-        { P1: Rock, P2: Paper } => Win,
+    return (P1, P2) switch
+    {
+        (Scissors, Paper) => Lose,
+        (Paper, Rock) => Lose,
+        (Rock, Scissors) => Lose,
+        (Scissors, Rock) => Win,
+        (Paper, Scissors) => Win,
+        (Rock, Paper) => Win,
         _ => throw new Exception("unhandled")
     };
+}
 
-    var (p1Score, p2Score) = result switch
+static (int, int) GetScores(Result result)
+{
+    return result switch
     {
         Lose => (6, 0),
         Win => (0, 6),
         Draw => (3, 3),
         _ => (0, 0)
     };
-
-    return new Score(opponentScore + p1Score, yourScore + p2Score);
-}
-
-
-
-static Choice GetChoiceBasedOnGuideline(Guideline guideline)
-{
-    Choice yourChoice;
-    if (guideline.DesiredResult == Draw) yourChoice = guideline.Opponent;
-    else yourChoice = guideline switch
-    {
-        { Opponent: Rock, DesiredResult: Lose } => Scissors,
-        { Opponent: Rock, DesiredResult: Win } => Paper,
-
-        { Opponent: Paper, DesiredResult: Lose } => Rock,
-        { Opponent: Paper, DesiredResult: Win } => Scissors,
-
-        { Opponent: Scissors, DesiredResult: Lose } => Paper,
-        { Opponent: Scissors, DesiredResult: Win } => Rock,
-        _ => throw new Exception("unhandled case")
-    };
-    return yourChoice;
 }
 
 record Game(Choice P1, Choice P2);
