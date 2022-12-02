@@ -7,9 +7,11 @@ if (args.Length == 0)
 
 var input = File.ReadAllLines(args[0]);
 
-var caloriesByElf = ParseCaloriesByElf(input);
+var caloriesByElf = ParseCaloriesByElf(input).ToList();
 
 WriteLine(caloriesByElf.Max(e => e));
+
+WriteLine(caloriesByElf.OrderByDescending(e => e).Take(3).Sum());
 
 IEnumerable<int> ParseCaloriesByElf(string[] input)
 {
@@ -21,11 +23,13 @@ IEnumerable<int> ParseCaloriesByElf(string[] input)
         {
             caloriesCarriedByElf += calories;
         }
-
+        
         if (string.IsNullOrEmpty(line))
         {
             yield return caloriesCarriedByElf;
             caloriesCarriedByElf = 0;
         }
     }
+
+    yield return caloriesCarriedByElf;
 }
