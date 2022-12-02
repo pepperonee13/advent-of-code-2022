@@ -1,6 +1,6 @@
 ﻿using static Choice;
 
-var input = File.ReadAllLines("../test-input.txt");
+var input = File.ReadAllLines("../puzzle-input.txt");
 
 var lines = input.Select(ParseGuideline).ToList();
 
