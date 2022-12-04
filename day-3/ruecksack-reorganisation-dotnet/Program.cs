@@ -1,7 +1,7 @@
 ﻿
-var input = File.ReadAllLines("../test-input.txt");
+var input = File.ReadAllLines("../puzzle-input.txt");
 
-var priorities = "abcdefghijklmnopqrstuvxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+var priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     .Select((c, i) => new { index = i, letter = c })
                     .ToDictionary(key => key.letter, value => value.index + 1);
 
