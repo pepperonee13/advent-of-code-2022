@@ -1,26 +1,23 @@
 ﻿var input = File.ReadAllLines("../puzzle-input.txt");
 
+
 var assignmentsToReconsider = 0;
 
 foreach (var line in input)
 {
     var assignments = line.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-    var sectionsA = ParseSections(assignments[0]);
-    var sectionsB = ParseSections(assignments[1]);
+    var (startA, endA) = ParseRange(assignments[0]);
+    var (startB, endB) = ParseRange(assignments[1]);
 
-    if (sectionsA.ToHashSet().IsSubsetOf(sectionsB) || sectionsB.ToHashSet().IsSubsetOf(sectionsA))
-    {
-        assignmentsToReconsider++;
-    }
+    if (startA >= startB && endA <= endB) assignmentsToReconsider++;
+    else if (startB >= startA && endB <= endA) assignmentsToReconsider++;
 }
 
 WriteLine(assignmentsToReconsider);
 
-static IEnumerable<int> ParseSections(string source)
+static (int start, int end) ParseRange(string source)
 {
     var assignment = source.Split("-", StringSplitOptions.RemoveEmptyEntries);
-    var start = int.Parse(assignment[0]);
-    var end = int.Parse(assignment[1]);
-    return Enumerable.Range(start, end - start + 1);
+    return (int.Parse(assignment[0]), int.Parse(assignment[1]));
 }
