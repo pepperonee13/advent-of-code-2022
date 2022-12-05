@@ -5,25 +5,23 @@ var priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     .Select((c, i) => new { index = i, letter = c })
                     .ToDictionary(key => key.letter, value => value.index + 1);
 
+const int GROUP_COUNT = 3;
 var total = 0;
 
-var group = new string[3];
+var currentGroup = new HashSet<char>();
 var i = 1;
 
 foreach (var line in input)
 {
-    group[i - 1] = line;
+    if (currentGroup.Count == 0) currentGroup.UnionWith(line);
+    else currentGroup.IntersectWith(line);
 
-    if (i % 3 == 0)
-    {
-        var commonLetter = group[0].Intersect(group[1]).Intersect(group[2]).FirstOrDefault();
-        total += priorities[commonLetter];
-        i = 1;
-        group = new string[3];
-    }
+    if (i != GROUP_COUNT) i++;
     else
     {
-        i++;
+        total += priorities[currentGroup.Single()];
+        currentGroup.Clear();
+        i = 1;
     }
 }
 
